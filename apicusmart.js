@@ -16,8 +16,8 @@ const con = mysql.createConnection({
 app.get('/', async (req, res) => {
     let { faculty, department, creationtime } = req.query;
   
-    const currentDate = new Date(creationtime);
-    const currentDateString = currentDate.toISOString().slice(0, 10);
+    const CreationTime = new Date(creationtime);
+    const CreationTimeString = CreationTime.toISOString().slice(0, 10);
     if (!faculty || !department || !creationtime) {
       // Use the fixed parameters for the SQL queries
       faculty = "Eng";
@@ -36,7 +36,7 @@ app.get('/', async (req, res) => {
         ORDER BY bld, DATE_FORMAT(creationtime, "%Y-%m-%d %H:00");
       `;
   
-      const results1 = await executeQuery(sqlQuery1, [faculty, department, currentDateString]);
+      const results1 = await executeQuery(sqlQuery1, [faculty, department, CreationTimeString]);
   
       // Execute the second query to get the sum of energy values for all buildings combined
       const sqlQuery2 = `
@@ -49,7 +49,7 @@ app.get('/', async (req, res) => {
         ORDER BY DATE_FORMAT(creationtime, "%Y-%m-%d %H:00");
       `;
   
-      const results2 = await executeQuery(sqlQuery2, [faculty, department, currentDateString]);
+      const results2 = await executeQuery(sqlQuery2, [faculty, department, CreationTimeString]);
   
       // Format the results and create the final output object
       const energyValuesByBld = {};
