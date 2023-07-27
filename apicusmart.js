@@ -1,7 +1,7 @@
 const express = require('express');
 const mysql = require('mysql');
 const app = express();
-const port = process.env.PORT||3000 ;
+const port = process.env.PORT||21 ;
 app.use(express.json());
 
 // Connect to MySQL
@@ -9,7 +9,7 @@ const con = mysql.createConnection({
   host: "ftp.pcshsptsama.com",
   user: "zp11489",
   password: "PcShSpT04475",
-  database: "21"
+  database: "zp11489_projecta"
 });
 
 // /////////////////////////////////////// Frist API/////////////////////////////////////////////////////////////
@@ -190,3 +190,4 @@ app.post("/recommend_cham9", async (request, response) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
