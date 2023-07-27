@@ -13,7 +13,7 @@ const con = mysql.createConnection({
 });
 
 // /////////////////////////////////////// Frist API/////////////////////////////////////////////////////////////
-app.post('/eng_eg', async (req, res) => {
+app.get('/', async (req, res) => {
     const { faculty, department, creationtime } = req.body;
   
     const currentDate = new Date(creationtime);
@@ -176,7 +176,7 @@ async function countUsingStatus(bld, room, fl_no, creationtime, time) {
 }
 }
 
-app.post("/recommend_cham9", async (request, response) => {
+app.get("/recommend_cham9", async (request, response) => {
   try {
     // Extract the required parameters from request body or query params
     const { bld, room, fl_no, creationtime, time } = request.body;
