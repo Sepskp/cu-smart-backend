@@ -3,6 +3,7 @@ const mysql = require('mysql');
 const app = express();
 const port = process.env.PORT||21 ;
 app.use(express.json());
+
 // Create a connection pool
 const pool = mysql.createPool({
   connectionLimit: 10, // Set the maximum number of connections in the pool
@@ -17,6 +18,7 @@ pool.on('error', (err) => {
 });
 
 // /////////////////////////////////////// Frist API/////////////////////////////////////////////////////////////
+
 app.get('/', async (req, res) => {
     let { faculty, department, creationtime } = req.query;
      if (!faculty || !department || !creationtime) {
@@ -151,74 +153,74 @@ function executeQuery(pool, sqlQuery, values) {
     });
   }
 // /////////////////////////////////////// Second API /////////////////////////////////////////////////////////////
-function executeQuery(query, values) {
-  return new Promise((resolve, reject) => {
-    con.query(query, values, (error, results) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(results);
-      }
-    });
-  });
-}
+// function executeQuery(query, values) {
+//   return new Promise((resolve, reject) => {
+//     con.query(query, values, (error, results) => {
+//       if (error) {
+//         reject(error);
+//       } else {
+//         resolve(results);
+//       }
+//     });
+//   });
+// }
 
-async function countUsingStatus(bld, room, fl_no, creationtime, time) {
-  try {
-    const query = `
-      SELECT DISTINCT DATE_FORMAT(creationtime, "%H:00") as timestartbld, monitor, room, sum(energy) AS energy,
-        CASE
-          WHEN sum(energy) >= 10 THEN 'using'
-          ELSE 'Not using' END AS cnt
-      FROM cham9
-      WHERE bld = ?
-        AND room = ?
-        AND fl_no = ?
-        AND DATE_FORMAT(creationtime, "%Y-%m-%d") = ?
-        AND DATE_FORMAT(creationtime, "%H:00") = TIME_FORMAT(DATE_SUB(TIME(?), INTERVAL 1 HOUR), '%H:%i')
-      GROUP BY room, monitor, DATE_FORMAT(creationtime, "%H:00")
-      ORDER BY monitor ASC;
-    `;
+// async function countUsingStatus(bld, room, fl_no, creationtime, time) {
+//   try {
+//     const query = `
+//       SELECT DISTINCT DATE_FORMAT(creationtime, "%H:00") as timestartbld, monitor, room, sum(energy) AS energy,
+//         CASE
+//           WHEN sum(energy) >= 10 THEN 'using'
+//           ELSE 'Not using' END AS cnt
+//       FROM cham9
+//       WHERE bld = ?
+//         AND room = ?
+//         AND fl_no = ?
+//         AND DATE_FORMAT(creationtime, "%Y-%m-%d") = ?
+//         AND DATE_FORMAT(creationtime, "%H:00") = TIME_FORMAT(DATE_SUB(TIME(?), INTERVAL 1 HOUR), '%H:%i')
+//       GROUP BY room, monitor, DATE_FORMAT(creationtime, "%H:00")
+//       ORDER BY monitor ASC;
+//     `;
 
-    const values = [bld, room, fl_no, creationtime, time];
-    const results = await executeQuery(query, values);
+//     const values = [bld, room, fl_no, creationtime, time];
+//     const results = await executeQuery(query, values);
 
-    // Count the 'cnt' values
-    const avaibleOutlet = results.filter(row => row.cnt === 'using').length;
-    const nonavaibleOutlet = results.filter(row => row.cnt === 'Not using').length;
-    const totalOutlet = nonavaibleOutlet + avaibleOutlet
-    // Calculate the percentage
-    const percentage = (avaibleOutlet / (nonavaibleOutlet + avaibleOutlet)) * 100;
- // Determine the label based on the percentage value
- let label;
- if (percentage < 10) {
-   label = "empty";
- } else if (percentage < 50) {
-   label = "recommend";
- } else if (percentage < 80) {
-    label = "Hot";
-  }else if (percentage > 80) {
-    label = "Full";
-  }else {
-   label = "No data";
- }
+//     // Count the 'cnt' values
+//     const avaibleOutlet = results.filter(row => row.cnt === 'using').length;
+//     const nonavaibleOutlet = results.filter(row => row.cnt === 'Not using').length;
+//     const totalOutlet = nonavaibleOutlet + avaibleOutlet
+//     // Calculate the percentage
+//     const percentage = (avaibleOutlet / (nonavaibleOutlet + avaibleOutlet)) * 100;
+//  // Determine the label based on the percentage value
+//  let label;
+//  if (percentage < 10) {
+//    label = "empty";
+//  } else if (percentage < 50) {
+//    label = "recommend";
+//  } else if (percentage < 80) {
+//     label = "Hot";
+//   }else if (percentage > 80) {
+//     label = "Full";
+//   }else {
+//    label = "No data";
+//  }
 
- return { totalOutlet,avaibleOutlet,percentage, label };
-} catch (error) {
- throw error;
-}
-}
+//  return { totalOutlet,avaibleOutlet,percentage, label };
+// } catch (error) {
+//  throw error;
+// }
+// }
 
-app.get("/recommend_cham9", async (request, response) => {
-  try {
-    // Extract the required parameters from request body or query params
-    const { bld, room, fl_no, creationtime, time } = request.body;
-    const counts = await countUsingStatus(bld, room, fl_no, creationtime, time);
-    response.json(counts);
-  } catch (error) {
-    response.status(500).json({ error: "An error occurred" });
-  }
-});
+// app.get("/recommend_cham9", async (request, response) => {
+//   try {
+//     // Extract the required parameters from request body or query params
+//     const { bld, room, fl_no, creationtime, time } = request.body;
+//     const counts = await countUsingStatus(bld, room, fl_no, creationtime, time);
+//     response.json(counts);
+//   } catch (error) {
+//     response.status(500).json({ error: "An error occurred" });
+//   }
+// });
 // /////////////////////////////////////// Third API /////////////////////////////////////////////////////////////
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
