@@ -15,15 +15,15 @@ const con = mysql.createConnection({
 // /////////////////////////////////////// Frist API/////////////////////////////////////////////////////////////
 app.get('/', async (req, res) => {
     let { faculty, department, creationtime } = req.query;
-  
-    const CreationTime = new Date(creationtime);
-    const CreationTimeString = CreationTime.toISOString().slice(0, 10);
-    if (!faculty || !department || !creationtime) {
+     if (!faculty || !department || !creationtime) {
       // Use the fixed parameters for the SQL queries
       faculty = "Eng";
       department = ["EE","ALL"];
       creationtime = "2022-09-01";
     }
+    const CreationTime = new Date(creationtime);
+    const CreationTimeString = CreationTime.toISOString().slice(0, 10);
+   
     try {
       // Execute the first query to get energy values per hour, categorized by "bld"
       const sqlQuery1 = `
