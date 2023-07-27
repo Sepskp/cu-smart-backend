@@ -18,7 +18,12 @@ app.get('/', async (req, res) => {
   
     const currentDate = new Date(creationtime);
     const currentDateString = currentDate.toISOString().slice(0, 10);
-  
+    if (!faculty || !department || !creationtime) {
+      // Use the fixed parameters for the SQL queries
+      faculty = "Eng";
+      department = ["EE","ALL"];
+      creationtime = "2022-09-01";
+    }
     try {
       // Execute the first query to get energy values per hour, categorized by "bld"
       const sqlQuery1 = `
