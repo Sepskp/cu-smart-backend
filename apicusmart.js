@@ -26,7 +26,7 @@ app.get('/', async (req, res) => {
    
     try {
       // Execute the first query to get energy values per hour, categorized by "bld"
-      const sqlQuery1 = `
+      let sqlQuery1 = `
         SELECT bld, DATE_FORMAT(creationtime, "%H:00") as timestart, SUM(energy) as value
         FROM zp11489_projecta.new_lumpsum_data
         WHERE faculty = ? 
@@ -34,12 +34,23 @@ app.get('/', async (req, res) => {
         AND DATE_FORMAT(creationtime, "%Y-%m-%d") = ?
         GROUP BY bld, DATE_FORMAT(creationtime, "%Y-%m-%d %H:00")
         ORDER BY bld, DATE_FORMAT(creationtime, "%Y-%m-%d %H:00");
-      `;
+      `; 
+      if (!sqlQuery1) {
+      let  sqlQuery1 = `
+        SELECT bld, DATE_FORMAT("2022-09-01", "%H:00") as timestart, SUM(energy) as value
+        FROM zp11489_projecta.new_lumpsum_data
+        WHERE faculty = "Eng" 
+        AND department IN ("EE","ALL") 
+        AND DATE_FORMAT(creationtime, "%Y-%m-%d") = "2022-09-01"
+        GROUP BY bld, DATE_FORMAT("2022-09-01", "%Y-%m-%d %H:00")
+        ORDER BY bld, DATE_FORMAT("2022-09-01", "%Y-%m-%d %H:00");
+      `; 
+    }
   
       const results1 = await executeQuery(sqlQuery1, [faculty, department, CreationTimeString]);
   
       // Execute the second query to get the sum of energy values for all buildings combined
-      const sqlQuery2 = `
+      let sqlQuery2 = `
         SELECT DATE_FORMAT(creationtime, "%H:00") as timestart, SUM(energy) as value
         FROM zp11489_projecta.new_lumpsum_data
         WHERE faculty = ? 
@@ -48,7 +59,17 @@ app.get('/', async (req, res) => {
         GROUP BY DATE_FORMAT(creationtime, "%Y-%m-%d %H:00")
         ORDER BY DATE_FORMAT(creationtime, "%Y-%m-%d %H:00");
       `;
-  
+        if (!sqlQuery2) {
+        let sqlQuery2 = `
+        SELECT DATE_FORMAT("2022-09-01", "%H:00") as timestart, SUM(energy) as value
+        FROM zp11489_projecta.new_lumpsum_data
+        WHERE faculty = "Eng" 
+        AND department IN ("EE","ALL") 
+        AND DATE_FORMAT(creationtime, "%Y-%m-%d") = "2022-09-01"
+        GROUP BY DATE_FORMAT("2022-09-01", "%Y-%m-%d %H:00")
+        ORDER BY DATE_FORMAT("2022-09-01", "%Y-%m-%d %H:00");
+      `;
+    }
       const results2 = await executeQuery(sqlQuery2, [faculty, department, CreationTimeString]);
   
       // Format the results and create the final output object
