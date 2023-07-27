@@ -11,8 +11,8 @@ const pool = mysql.createPool({
   user: "zp11489",
   password: "PcShSpT04475",
   database: "zp11489_projecta",
-  acquireTimeout: 180000, // 60 seconds
-  connectTimeout: 180000 // 60 seconds
+  acquireTimeout: 180000, // 180 seconds
+  connectTimeout: 180000 // 180 seconds
 });
 // Handle MySQL connection errors
 pool.on('error', (err) => {
