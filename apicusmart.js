@@ -10,7 +10,9 @@ const pool = mysql.createPool({
   host: "ftp.pcshsptsama.com",
   user: "zp11489",
   password: "PcShSpT04475",
-  database: "zp11489_projecta"
+  database: "zp11489_projecta",
+  acquireTimeout: 30000, // 30 seconds
+  connectTimeout: 30000 // 30 seconds
 });
 // Handle MySQL connection errors
 pool.on('error', (err) => {
