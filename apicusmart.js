@@ -14,7 +14,7 @@ const con = mysql.createConnection({
 
 // /////////////////////////////////////// Frist API/////////////////////////////////////////////////////////////
 app.get('/', async (req, res) => {
-    const { faculty, department, creationtime } = req.query;
+    let { faculty, department, creationtime } = req.query;
   
     const currentDate = new Date(creationtime);
     const currentDateString = currentDate.toISOString().slice(0, 10);
