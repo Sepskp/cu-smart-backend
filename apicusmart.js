@@ -3,13 +3,17 @@ const mysql = require('mysql');
 const app = express();
 const port = process.env.PORT||21 ;
 app.use(express.json());
-
-// Connect to MySQL
-const con = mysql.createConnection({
+// Create a connection pool
+const pool = mysql.createPool({
+  connectionLimit: 10, // Set the maximum number of connections in the pool
   host: "ftp.pcshsptsama.com",
   user: "zp11489",
   password: "PcShSpT04475",
   database: "zp11489_projecta"
+});
+// Handle MySQL connection errors
+pool.on('error', (err) => {
+  console.error('MySQL pool error:', err.message);
 });
 
 // /////////////////////////////////////// Frist API/////////////////////////////////////////////////////////////
@@ -24,7 +28,7 @@ app.get('/', async (req, res) => {
     const CreationTime = new Date(creationtime);
     const CreationTimeString = CreationTime.toISOString().slice(0, 10);
    
-    try {
+    
       // Execute the first query to get energy values per hour, categorized by "bld"
       let sqlQuery1 = `
         SELECT bld, DATE_FORMAT(creationtime, "%H:00") as timestart, SUM(energy) as value
@@ -47,7 +51,7 @@ app.get('/', async (req, res) => {
       `; 
     }
   
-      const results1 = await executeQuery(sqlQuery1, [faculty, department, CreationTimeString]);
+     
   
       // Execute the second query to get the sum of energy values for all buildings combined
       let sqlQuery2 = `
@@ -70,7 +74,10 @@ app.get('/', async (req, res) => {
         ORDER BY DATE_FORMAT("2022-09-01", "%Y-%m-%d %H:00");
       `;
     }
-      const results2 = await executeQuery(sqlQuery2, [faculty, department, CreationTimeString]);
+      try {
+          // Execute queries using the connection pool
+          const results1 = await executeQuery(pool, sqlQuery1, [faculty, department, CreationTimeString]);
+          const results2 = await executeQuery(pool, sqlQuery2, [faculty, department, CreationTimeString]);
   
       // Format the results and create the final output object
       const energyValuesByBld = {};
@@ -131,10 +138,10 @@ app.get('/', async (req, res) => {
     }
   });
   
-  // Function to execute a single query and return a Promise
-  function executeQuery(sqlQuery, values) {
+// Function to execute a single query using the connection pool and return a Promise
+function executeQuery(pool, sqlQuery, values) {
     return new Promise((resolve, reject) => {
-      con.query(sqlQuery, values, (err, results) => {
+      pool.query(sqlQuery, values, (err, results) => {
         if (err) {
           reject(err);
         } else {
@@ -216,4 +223,3 @@ app.get("/recommend_cham9", async (request, response) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
