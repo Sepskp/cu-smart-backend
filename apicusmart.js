@@ -28,7 +28,7 @@ app.get('/', async (req, res) => {
       // Execute the first query to get energy values per hour, categorized by "bld"
       const sqlQuery1 = `
         SELECT bld, DATE_FORMAT(creationtime, "%H:00") as timestart, SUM(energy) as value
-        FROM new_lumpsum_data
+        FROM zp11489_projecta.new_lumpsum_data
         WHERE faculty = ? 
         AND department IN (?) 
         AND DATE_FORMAT(creationtime, "%Y-%m-%d") = ?
@@ -41,7 +41,7 @@ app.get('/', async (req, res) => {
       // Execute the second query to get the sum of energy values for all buildings combined
       const sqlQuery2 = `
         SELECT DATE_FORMAT(creationtime, "%H:00") as timestart, SUM(energy) as value
-        FROM new_lumpsum_data
+        FROM zp11489_projecta.new_lumpsum_data
         WHERE faculty = ? 
         AND department IN (?) 
         AND DATE_FORMAT(creationtime, "%Y-%m-%d") = ?
