@@ -11,8 +11,8 @@ const pool = mysql.createPool({
   user: "zp11489",
   password: "PcShSpT04475",
   database: "zp11489_projecta",
-  acquireTimeout: 30000, // 30 seconds
-  connectTimeout: 30000 // 30 seconds
+  acquireTimeout: 180000, // 60 seconds
+  connectTimeout: 180000 // 60 seconds
 });
 // Handle MySQL connection errors
 pool.on('error', (err) => {
@@ -45,13 +45,13 @@ app.get('/', async (req, res) => {
       `; 
       if (!sqlQuery1) {
       let  sqlQuery1 = `
-        SELECT bld, DATE_FORMAT("2022-09-01", "%H:00") as timestart, SUM(energy) as value
+        SELECT bld, DATE_FORMAT(creationtime, "%H:00") as timestart, SUM(energy) as value
         FROM zp11489_projecta.new_lumpsum_data
         WHERE faculty = "Eng" 
         AND department IN ("EE","ALL") 
         AND DATE_FORMAT(creationtime, "%Y-%m-%d") = "2022-09-01"
-        GROUP BY bld, DATE_FORMAT("2022-09-01", "%Y-%m-%d %H:00")
-        ORDER BY bld, DATE_FORMAT("2022-09-01", "%Y-%m-%d %H:00");
+        GROUP BY bld, DATE_FORMAT(creationtime, "%Y-%m-%d %H:00")
+        ORDER BY bld, DATE_FORMAT(creationtime, "%Y-%m-%d %H:00");
       `; 
     }
   
@@ -69,13 +69,13 @@ app.get('/', async (req, res) => {
       `;
         if (!sqlQuery2) {
         let sqlQuery2 = `
-        SELECT DATE_FORMAT("2022-09-01", "%H:00") as timestart, SUM(energy) as value
+        SELECT DATE_FORMAT(creationtime, "%H:00") as timestart, SUM(energy) as value
         FROM zp11489_projecta.new_lumpsum_data
         WHERE faculty = "Eng" 
         AND department IN ("EE","ALL") 
         AND DATE_FORMAT(creationtime, "%Y-%m-%d") = "2022-09-01"
-        GROUP BY DATE_FORMAT("2022-09-01", "%Y-%m-%d %H:00")
-        ORDER BY DATE_FORMAT("2022-09-01", "%Y-%m-%d %H:00");
+        GROUP BY DATE_FORMAT(creationtime, "%Y-%m-%d %H:00")
+        ORDER BY DATE_FORMAT(creationtime, "%Y-%m-%d %H:00");
       `;
     }
       try {
@@ -227,3 +227,4 @@ function executeQuery(pool, sqlQuery, values) {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
